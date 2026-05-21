@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TshirtXpress — Design V2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:   #0A0A0A;
+      --lime:    #C8FF00;
+      --lime-dk: #A8D800;
+      --white:   #FFFFFF;
+      --gray:    #F4F4F2;
+      --muted:   #737373;
+      --border:  #E8E8E8;
+      --dark-card: #141414;
+      --radius:  14px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--black);
+      background: var(--white);
+      overflow-x: hidden;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes slideLeft {
+      from { opacity: 0; transform: translateX(40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-10px); }
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+
+    /* Scroll-triggered reveal classes */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal-left.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal-right.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Stagger children */
+    .stagger > * { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .stagger.visible > *:nth-child(1) { opacity:1; transform:none; transition-delay: 0.05s; }
+    .stagger.visible > *:nth-child(2) { opacity:1; transform:none; transition-delay: 0.15s; }
+    .stagger.visible > *:nth-child(3) { opacity:1; transform:none; transition-delay: 0.25s; }
+    .stagger.visible > *:nth-child(4) { opacity:1; transform:none; transition-delay: 0.35s; }
+    .stagger.visible > *:nth-child(5) { opacity:1; transform:none; transition-delay: 0.45s; }
+    .stagger.visible > *:nth-child(6) { opacity:1; transform:none; transition-delay: 0.55s; }
+
+    /* ── ANNOUNCEMENT ── */
+    .announcement {
+      background: var(--lime);
+      color: var(--black);
+      text-align: center;
+      padding: 9px 20px;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--black);
+      padding: 0 48px; height: 66px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.2rem;
+      color: var(--white); letter-spacing: -0.02em;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .logo-dot {
+      width: 8px; height: 8px; background: var(--lime); border-radius: 50%;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    .nav-links { display: flex; align-items: center; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-size: 0.85rem; font-weight: 500; color: rgba(255,255,255,0.55);
+      transition: color 0.2s; letter-spacing: 0.01em;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: 0.85rem; cursor: pointer; transition: all 0.22s;
+      border: none; letter-spacing: 0.01em;
+    }
+    .btn-nav-ghost {
+      background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.8);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 9px 18px; border-radius: 8px;
+    }
+    .btn-nav-ghost:hover { background: rgba(255,255,255,0.12); color: white; }
+    .btn-lime {
+      background: var(--lime); color: var(--black);
+      padding: 10px 20px; border-radius: 8px;
+    }
+    .btn-lime:hover { background: var(--lime-dk); }
+    .btn-lime-lg {
+      background: var(--lime); color: var(--black);
+      padding: 16px 32px; border-radius: 10px; font-size: 1rem;
+    }
+    .btn-lime-lg:hover { background: var(--lime-dk); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(200,255,0,0.25); }
+    .btn-outline-dark {
+      background: transparent; color: var(--black);
+      border: 2px solid var(--black);
+      padding: 14px 30px; border-radius: 10px; font-size: 1rem;
+    }
+    .btn-outline-dark:hover { background: var(--black); color: white; }
+    .btn-outline-white {
+      background: transparent; color: white;
+      border: 2px solid rgba(255,255,255,0.25);
+      padding: 14px 30px; border-radius: 10px; font-size: 1rem;
+    }
+    .btn-outline-white:hover { border-color: white; }
+
+    /* ── HERO ── */
+    .hero-section {
+      background: var(--black);
+      padding: 72px 48px 0;
+      overflow: hidden;
+    }
+    .hero-inner {
+      max-width: 1280px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 48px; align-items: start;
+    }
+
+    /* Hero left */
+    .hero-left { padding-top: 16px; animation: fadeUp 0.9s ease forwards; }
+
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.6);
+      font-size: 0.76rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;
+      padding: 7px 14px; border-radius: 100px; margin-bottom: 28px;
+    }
+    .hero-tag span { width: 6px; height: 6px; background: var(--lime); border-radius: 50%; display: inline-block; }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(3rem, 5vw, 4.4rem);
+      font-weight: 800; line-height: 1.03; letter-spacing: -0.035em;
+      color: white; margin-bottom: 24px;
+    }
+    .hero h1 .lime { color: var(--lime); }
+    .hero h1 .outline-text {
+      -webkit-text-stroke: 2px white;
+      color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 1rem; color: rgba(255,255,255,0.55);
+      max-width: 420px; line-height: 1.75; margin-bottom: 36px;
+    }
+    .hero-cta-row { display: flex; align-items: center; gap: 14px; margin-bottom: 48px; }
+
+    .hero-checks {
+      display: flex; flex-direction: column; gap: 12px;
+      padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .hero-check {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 0.875rem; color: rgba(255,255,255,0.5);
+    }
+    .check-bullet {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: rgba(200,255,0,0.12); border: 1px solid rgba(200,255,0,0.3);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .check-bullet svg { width: 11px; height: 11px; stroke: var(--lime); fill: none; }
+
+    /* Hero right: bento grid */
+    .hero-bento {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 280px 180px;
+      gap: 12px;
+      animation: slideLeft 1s ease 0.2s forwards;
+      opacity: 0;
+    }
+    .bento-card {
+      border-radius: 16px; overflow: hidden; position: relative;
+    }
+    .bento-card img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Big card spans both rows on left */
+    .bento-big { grid-row: 1 / 3; }
+
+    /* Stat card */
+    .bento-stat {
+      background: var(--lime);
+      display: flex; flex-direction: column;
+      justify-content: flex-end; padding: 22px;
+    }
+    .bento-stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.6rem; font-weight: 800;
+      color: var(--black); line-height: 1; margin-bottom: 4px;
+    }
+    .bento-stat-label { font-size: 0.82rem; font-weight: 600; color: rgba(0,0,0,0.55); }
+
+    .bento-feature {
+      background: var(--dark-card);
+      display: flex; flex-direction: column;
+      justify-content: flex-end; padding: 22px;
+    }
+    .bento-feature-icon {
+      width: 36px; height: 36px; background: rgba(200,255,0,0.1);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px;
+    }
+    .bento-feature-icon svg { width: 18px; height: 18px; stroke: var(--lime); fill: none; }
+    .bento-feature-title { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; color: white; margin-bottom: 4px; }
+    .bento-feature-sub { font-size: 0.78rem; color: rgba(255,255,255,0.4); }
+
+    /* ── MARQUEE ── */
+    .marquee-section {
+      background: var(--lime);
+      padding: 14px 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .marquee-track {
+      display: inline-flex;
+      animation: marquee 22s linear infinite;
+    }
+    .marquee-item {
+      display: inline-flex; align-items: center; gap: 16px;
+      padding: 0 24px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 0.9rem;
+      color: var(--black); letter-spacing: 0.02em; text-transform: uppercase;
+    }
+    .marquee-dot { width: 6px; height: 6px; background: rgba(0,0,0,0.3); border-radius: 50%; flex-shrink: 0; }
+
+    /* ── SECTION BASE ── */
+    .section { padding: 96px 48px; }
+    .section-inner { max-width: 1200px; margin: 0 auto; }
+
+    .tag-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(200,255,0,0.12); border: 1px solid rgba(200,255,0,0.25);
+      color: #4D5C00; font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      padding: 5px 12px; border-radius: 100px; margin-bottom: 14px;
+    }
+    .tag-pill-dark {
+      background: rgba(200,255,0,0.1); border-color: rgba(200,255,0,0.2); color: var(--lime);
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 3.2vw, 2.8rem); font-weight: 800;
+      letter-spacing: -0.03em; line-height: 1.1;
+      color: var(--black); margin-bottom: 14px;
+    }
+    .section-title-white { color: white; }
+
+    .section-sub {
+      font-size: 1rem; color: var(--muted);
+      max-width: 500px; line-height: 1.75; margin-bottom: 52px;
+    }
+    .section-sub-white { color: rgba(255,255,255,0.5); }
+
+    /* ── STATS BAND ── */
+    .stats-band { background: var(--gray); }
+    .stats-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(4,1fr); }
+    .stat-col {
+      padding: 48px 36px; border-right: 1px solid var(--border); text-align: center;
+    }
+    .stat-col:last-child { border-right: none; }
+    .stat-big {
+      font-family: 'Syne', sans-serif;
+      font-size: 3rem; font-weight: 800; color: var(--black);
+      letter-spacing: -0.04em; line-height: 1; margin-bottom: 8px;
+    }
+    .stat-big .lime { color: var(--lime-dk); }
+    .stat-lbl { font-size: 0.875rem; color: var(--muted); font-weight: 500; }
+
+    /* ── CATEGORIES ── */
+    .cat-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 16px;
+    }
+    .cat-tile {
+      border-radius: 16px; overflow: hidden; position: relative;
+      aspect-ratio: 4/3; cursor: pointer;
+    }
+    .cat-tile img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+    .cat-tile:hover img { transform: scale(1.07); }
+    .cat-tile-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.75) 100%);
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 22px;
+      transition: background 0.3s ease;
+    }
+    .cat-tile:hover .cat-tile-overlay { background: linear-gradient(to bottom, transparent 20%, rgba(0,0,0,0.85) 100%); }
+    .cat-tile-name {
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: 1.1rem; color: white; margin-bottom: 4px;
+    }
+    .cat-tile-count { font-size: 0.8rem; color: rgba(255,255,255,0.6); }
+    .cat-tile-arrow {
+      position: absolute; top: 16px; right: 16px;
+      width: 36px; height: 36px; background: white; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transform: translateY(-6px);
+      transition: all 0.3s ease;
+    }
+    .cat-tile:hover .cat-tile-arrow { opacity: 1; transform: translateY(0); }
+    .cat-tile-arrow svg { width: 14px; height: 14px; stroke: var(--black); fill: none; }
+
+    /* ── PROCESS ── */
+    .process-section { background: var(--black); }
+    .process-list { display: flex; flex-direction: column; gap: 0; }
+    .process-item {
+      display: grid; grid-template-columns: 80px 1fr auto;
+      align-items: center; gap: 28px;
+      padding: 28px 0; border-bottom: 1px solid rgba(255,255,255,0.07);
+      transition: all 0.3s ease; cursor: default;
+    }
+    .process-item:last-child { border-bottom: none; }
+    .process-item:hover { padding-left: 12px; }
+    .process-num {
+      font-family: 'Syne', sans-serif; font-size: 3.5rem; font-weight: 800;
+      color: rgba(255,255,255,0.08); line-height: 1; letter-spacing: -0.04em;
+      transition: color 0.3s ease;
+    }
+    .process-item:hover .process-num { color: var(--lime); }
+    .process-title {
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: 1.2rem; color: rgba(255,255,255,0.85); margin-bottom: 5px;
+      transition: color 0.3s ease;
+    }
+    .process-item:hover .process-title { color: white; }
+    .process-desc { font-size: 0.875rem; color: rgba(255,255,255,0.38); line-height: 1.65; max-width: 480px; }
+    .process-badge {
+      background: rgba(200,255,0,0.08); border: 1px solid rgba(200,255,0,0.15);
+      color: var(--lime); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em;
+      text-transform: uppercase; padding: 6px 14px; border-radius: 100px; white-space: nowrap;
+      opacity: 0; transition: opacity 0.3s ease;
+    }
+    .process-item:hover .process-badge { opacity: 1; }
+
+    /* ── PRINT METHODS ── */
+    .methods-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
+    }
+    .method-tile {
+      border-radius: 16px; overflow: hidden; border: 1px solid var(--border);
+      transition: all 0.3s ease; cursor: default;
+    }
+    .method-tile:hover { border-color: var(--black); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
+    .method-img { height: 200px; overflow: hidden; }
+    .method-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+    .method-tile:hover .method-img img { transform: scale(1.06); }
+    .method-body { padding: 22px; }
+    .method-chip {
+      display: inline-block;
+      background: var(--gray); color: var(--muted);
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 6px; margin-bottom: 10px;
+    }
+    .method-tile:hover .method-chip { background: var(--lime); color: var(--black); }
+    .method-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: var(--black); margin-bottom: 6px; }
+    .method-desc { font-size: 0.855rem; color: var(--muted); line-height: 1.65; }
+
+    /* ── WHY US ── */
+    .why-section { background: var(--black); }
+    .features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+    .feat-card {
+      background: var(--dark-card); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px; padding: 28px;
+      transition: all 0.3s ease; cursor: default;
+    }
+    .feat-card:hover { border-color: rgba(200,255,0,0.2); transform: translateY(-3px); }
+    .feat-icon {
+      width: 46px; height: 46px; border-radius: 10px;
+      background: rgba(200,255,0,0.08); border: 1px solid rgba(200,255,0,0.15);
+      display: flex; align-items: center; justify-content: center; margin-bottom: 18px;
+      transition: background 0.3s ease;
+    }
+    .feat-card:hover .feat-icon { background: rgba(200,255,0,0.16); }
+    .feat-icon svg { width: 22px; height: 22px; stroke: var(--lime); fill: none; }
+    .feat-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: white; margin-bottom: 8px; }
+    .feat-desc { font-size: 0.855rem; color: rgba(255,255,255,0.45); line-height: 1.65; }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials-section { background: var(--gray); }
+    .testi-grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 16px; align-items: start; }
+    .testi-card {
+      background: white; border-radius: 16px; padding: 28px;
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+    }
+    .testi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.07); }
+    .testi-card.featured { background: var(--black); border-color: transparent; }
+    .testi-stars { display: flex; gap: 3px; margin-bottom: 18px; }
+    .testi-stars svg { width: 16px; height: 16px; fill: #F59E0B; }
+    .testi-card.featured .testi-stars svg { fill: var(--lime); }
+    .testi-quote { font-size: 0.92rem; line-height: 1.75; color: var(--black); margin-bottom: 22px; }
+    .testi-card.featured .testi-quote { color: rgba(255,255,255,0.75); }
+    .testi-author { display: flex; align-items: center; gap: 12px; }
+    .testi-avatar { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+    .testi-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .testi-name { font-family: 'Syne', sans-serif; font-size: 0.875rem; font-weight: 700; color: var(--black); }
+    .testi-card.featured .testi-name { color: white; }
+    .testi-role { font-size: 0.78rem; color: var(--muted); }
+    .testi-card.featured .testi-role { color: rgba(255,255,255,0.4); }
+
+    /* ── CTA ── */
+    .cta-section {
+      background: var(--black);
+      padding: 96px 48px;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-bg-glow {
+      position: absolute; width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(200,255,0,0.08) 0%, transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      pointer-events: none;
+      animation: float 6s ease-in-out infinite;
+    }
+    .cta-inner { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
+    .cta-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.2rem, 4vw, 3.4rem); font-weight: 800;
+      color: white; letter-spacing: -0.035em; line-height: 1.1; margin-bottom: 16px;
+    }
+    .cta-title .lime { color: var(--lime); }
+    .cta-sub { font-size: 1rem; color: rgba(255,255,255,0.5); margin-bottom: 36px; line-height: 1.7; }
+    .cta-actions { display: flex; align-items: center; justify-content: center; gap: 14px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--black);
+      border-top: 1px solid rgba(255,255,255,0.07);
+      padding: 64px 48px 32px;
+      color: rgba(255,255,255,0.5);
+    }
+    .footer-top {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px; margin-bottom: 48px;
+    }
+    .footer-logo {
+      font-family: 'Syne', sans-serif; font-weight: 800;
+      font-size: 1.2rem; color: white; letter-spacing: -0.02em;
+      display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+    }
+    .footer-brand p { font-size: 0.875rem; line-height: 1.7; max-width: 260px; }
+    .footer-col h4 {
+      font-family: 'Syne', sans-serif; font-size: 0.8rem; font-weight: 700;
+      color: white; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 16px;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul a { font-size: 0.875rem; color: rgba(255,255,255,0.4); transition: color 0.2s; }
+    .footer-col ul a:hover { color: white; }
+    .footer-bottom {
+      max-width: 1200px; margin: 0 auto;
+      padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.07);
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.8rem;
+    }
+    .footer-socials { display: flex; gap: 12px; }
+    .social-btn {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; cursor: pointer;
+    }
+    .social-btn:hover { background: rgba(200,255,0,0.1); border-color: rgba(200,255,0,0.25); }
+    .social-btn svg { width: 15px; height: 15px; stroke: rgba(255,255,255,0.5); fill: none; transition: stroke 0.2s; }
+    .social-btn:hover svg { stroke: var(--lime); }
+  </style>
+</head>
+<body>
+
+  <!-- Announcement -->
+  <div class="announcement">
+    ⚡ LAUNCH OFFER — 20% off your first bulk order · Use code XPRESS20 · Free shipping over $150
+  </div>
+
+  <!-- Navbar -->
+  <nav>
+    <div class="nav-logo">
+      <div class="logo-dot"></div>
+      TshirtXpress
+    </div>
+    <ul class="nav-links">
+      <li><a href="#">Products</a></li>
+      <li><a href="#">Custom Order</a></li>
+      <li><a href="#">Bulk Pricing</a></li>
+      <li><a href="#">Gallery</a></li>
+      <li><a href="#">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="btn btn-nav-ghost">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+        Cart (0)
+      </button>
+      <button class="btn btn-lime">Start Designing →</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero-section">
+    <div class="hero-inner">
+
+      <!-- Left -->
+      <div class="hero-left">
+        <div class="hero-tag"><span></span> Trusted by 2,000+ businesses worldwide</div>
+        <h1>
+          Print Bold.<br/>
+          Deliver <span class="lime">Fast.</span><br/>
+          <span class="outline-text">Look Great.</span>
+        </h1>
+        <p class="hero-desc">Professional custom printing for teams, events, and brands. Your design on premium blanks — shipped in as little as 48 hours.</p>
+        <div class="hero-cta-row">
+          <button class="btn btn-lime-lg">Start Your Order →</button>
+          <button class="btn btn-outline-white">View Pricing</button>
+        </div>
+        <div class="hero-checks">
+          <div class="hero-check">
+            <div class="check-bullet"><svg viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+            No minimum order quantity
+          </div>
+          <div class="hero-check">
+            <div class="check-bullet"><svg viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+            48-hour rush production available
+          </div>
+          <div class="hero-check">
+            <div class="check-bullet"><svg viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+            100% satisfaction guarantee
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Bento -->
+      <div class="hero-bento">
+
+        <!-- Big image -->
+        <div class="bento-card bento-big">
+          <img src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?auto=format&fit=crop&w=700&q=85" alt="Custom print" />
+        </div>
+
+        <!-- Lime stat card -->
+        <div class="bento-card bento-stat" style="animation: float 5s ease-in-out 1s infinite;">
+          <div class="bento-stat-num" data-count="50000">0</div>
+          <div class="bento-stat-label">Items printed to date</div>
+        </div>
+
+        <!-- Dark feature card -->
+        <div class="bento-card bento-feature">
+          <div class="bento-feature-icon">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div>
+            <div class="bento-feature-title">48-hr Rush</div>
+            <div class="bento-feature-sub">Same-week delivery</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Marquee -->
+  <div class="marquee-section">
+    <div class="marquee-track">
+      <!-- duplicated for seamless loop -->
+      <span class="marquee-item">Screen Printing <span class="marquee-dot"></span></span>
+      <span class="marquee-item">Direct to Garment <span class="marquee-dot"></span></span>
+      <span class="marquee-item">Embroidery <span class="marquee-dot"></span></span>
+      <span class="marquee-item">No Minimums <span class="marquee-dot"></span></span>
+      <span class="marquee-item">48-Hour Rush <span class="marquee-dot"></span></span>
+      <span class="marquee-item">Bulk Discounts <span class="marquee-dot"></span></span>
+      <span class="marquee-item">Free Proofing <span class="marquee-dot"></span></span>
+      <span class="marquee-item">Custom Packaging <span class="marquee-dot"></span></span>
+      <span class="marquee-item">Screen Printing <span class="marquee-dot"></span></span>
+      <span class="marquee-item">Direct to Garment <span class="marquee-dot"></span></span>
+      <span class="marquee-item">Embroidery <span class="marquee-dot"></span></span>
+      <span class="marquee-item">No Minimums <span class="marquee-dot"></span></span>
+      <span class="marquee-item">48-Hour Rush <span class="marquee-dot"></span></span>
+      <span class="marquee-item">Bulk Discounts <span class="marquee-dot"></span></span>
+      <span class="marquee-item">Free Proofing <span class="marquee-dot"></span></span>
+      <span class="marquee-item">Custom Packaging <span class="marquee-dot"></span></span>
+    </div>
+  </div>
+
+  <!-- Stats Band -->
+  <div class="stats-band reveal">
+    <div class="stats-inner">
+      <div class="stat-col">
+        <div class="stat-big"><span class="counter" data-target="2000">0</span><span class="lime">+</span></div>
+        <div class="stat-lbl">Happy Clients</div>
+      </div>
+      <div class="stat-col">
+        <div class="stat-big"><span class="counter" data-target="50">0</span><span class="lime">K+</span></div>
+        <div class="stat-lbl">Items Printed</div>
+      </div>
+      <div class="stat-col">
+        <div class="stat-big">48<span class="lime">hr</span></div>
+        <div class="stat-lbl">Rush Turnaround</div>
+      </div>
+      <div class="stat-col">
+        <div class="stat-big">4.9<span class="lime">★</span></div>
+        <div class="stat-lbl">Average Rating</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Categories -->
+  <section class="section">
+    <div class="section-inner">
+      <div class="reveal">
+        <div class="tag-pill">Product Range</div>
+        <h2 class="section-title">Everything You Can<br/>Print On</h2>
+        <p class="section-sub">From corporate uniforms to street merch — we stock the blanks, you bring the creativity.</p>
+      </div>
+
+      <div class="cat-grid stagger">
+        <div class="cat-tile">
+          <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=600&q=80" alt="T-Shirts" />
+          <div class="cat-tile-overlay">
+            <div class="cat-tile-name">T-Shirts</div>
+            <div class="cat-tile-count">48 styles available</div>
+          </div>
+          <div class="cat-tile-arrow"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+        </div>
+        <div class="cat-tile">
+          <img src="https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=600&q=80" alt="Hoodies" />
+          <div class="cat-tile-overlay">
+            <div class="cat-tile-name">Hoodies & Sweats</div>
+            <div class="cat-tile-count">22 styles available</div>
+          </div>
+          <div class="cat-tile-arrow"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+        </div>
+        <div class="cat-tile">
+          <img src="https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?auto=format&fit=crop&w=600&q=80" alt="Polo Shirts" />
+          <div class="cat-tile-overlay">
+            <div class="cat-tile-name">Polo Shirts</div>
+            <div class="cat-tile-count">18 styles available</div>
+          </div>
+          <div class="cat-tile-arrow"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+        </div>
+        <div class="cat-tile">
+          <img src="https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?auto=format&fit=crop&w=600&q=80" alt="Tote Bags" />
+          <div class="cat-tile-overlay">
+            <div class="cat-tile-name">Tote Bags</div>
+            <div class="cat-tile-count">14 styles available</div>
+          </div>
+          <div class="cat-tile-arrow"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+        </div>
+        <div class="cat-tile">
+          <img src="https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=600&q=80" alt="Caps" />
+          <div class="cat-tile-overlay">
+            <div class="cat-tile-name">Caps & Headwear</div>
+            <div class="cat-tile-count">30 styles available</div>
+          </div>
+          <div class="cat-tile-arrow"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+        </div>
+        <div class="cat-tile">
+          <img src="https://images.unsplash.com/photo-1560343090-f0409e92791a?auto=format&fit=crop&w=600&q=80" alt="Accessories" />
+          <div class="cat-tile-overlay">
+            <div class="cat-tile-name">Accessories & More</div>
+            <div class="cat-tile-count">55+ items</div>
+          </div>
+          <div class="cat-tile-arrow"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Process -->
+  <section class="section process-section">
+    <div class="section-inner">
+      <div class="reveal">
+        <div class="tag-pill tag-pill-dark">Simple Process</div>
+        <h2 class="section-title section-title-white">Order in 4 Steps</h2>
+        <p class="section-sub section-sub-white">No complicated quoting forms. No back-and-forth. Just pick, upload, approve, receive.</p>
+      </div>
+
+      <div class="process-list">
+        <div class="process-item reveal">
+          <div class="process-num">01</div>
+          <div>
+            <div class="process-title">Choose Your Product</div>
+            <div class="process-desc">Browse tees, hoodies, polos, tote bags, caps, and more. Filter by material, weight, and colour to find the perfect blank.</div>
+          </div>
+          <div class="process-badge">Browse Catalogue</div>
+        </div>
+        <div class="process-item reveal">
+          <div class="process-num">02</div>
+          <div>
+            <div class="process-title">Upload Your Design</div>
+            <div class="process-desc">Upload your artwork or use our free online designer. We accept PNG, SVG, PDF, and AI files at any resolution.</div>
+          </div>
+          <div class="process-badge">Use Designer Tool</div>
+        </div>
+        <div class="process-item reveal">
+          <div class="process-num">03</div>
+          <div>
+            <div class="process-title">Review & Approve Proof</div>
+            <div class="process-desc">We send a digital mockup proof before printing anything. You approve it — we don't print until you're happy.</div>
+          </div>
+          <div class="process-badge">Zero Surprises</div>
+        </div>
+        <div class="process-item reveal">
+          <div class="process-num">04</div>
+          <div>
+            <div class="process-title">Receive Fast Delivery</div>
+            <div class="process-desc">Orders ship within 2–5 business days. Rush options available for same-week or 48-hour turnaround.</div>
+          </div>
+          <div class="process-badge">Track Your Order</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Print Methods -->
+  <section class="section">
+    <div class="section-inner">
+      <div class="reveal">
+        <div class="tag-pill">Print Technology</div>
+        <h2 class="section-title">The Right Method<br/>for Every Job</h2>
+        <p class="section-sub">We don't do one-size-fits-all. We match the technique to your fabric, design, and order size.</p>
+      </div>
+
+      <div class="methods-grid stagger">
+        <div class="method-tile">
+          <div class="method-img">
+            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=700&q=80" alt="Screen Printing" />
+          </div>
+          <div class="method-body">
+            <div class="method-chip">Best for bulk</div>
+            <div class="method-name">Screen Printing</div>
+            <div class="method-desc">Durable, vibrant, and cost-effective at scale. Perfect for simple designs and orders of 12+.</div>
+          </div>
+        </div>
+        <div class="method-tile">
+          <div class="method-img">
+            <img src="https://images.unsplash.com/photo-1561069934-eee225952461?auto=format&fit=crop&w=700&q=80" alt="DTG Printing" />
+          </div>
+          <div class="method-body">
+            <div class="method-chip">Best for detail</div>
+            <div class="method-name">Direct-to-Garment</div>
+            <div class="method-desc">Photo-realistic prints with unlimited colours. No minimums — ideal for small runs and complex artwork.</div>
+          </div>
+        </div>
+        <div class="method-tile">
+          <div class="method-img">
+            <img src="https://images.unsplash.com/photo-1604671801908-6f0c6a092c05?auto=format&fit=crop&w=700&q=80" alt="Embroidery" />
+          </div>
+          <div class="method-body">
+            <div class="method-chip">Best for premium</div>
+            <div class="method-name">Embroidery</div>
+            <div class="method-desc">Raised, textured stitching for a premium feel. Perfect for logos on polos, caps, and jackets.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Us -->
+  <section class="section why-section">
+    <div class="section-inner">
+      <div class="reveal">
+        <div class="tag-pill tag-pill-dark">Why TshirtXpress</div>
+        <h2 class="section-title section-title-white">We Print. You Shine.</h2>
+        <p class="section-sub section-sub-white">Not a faceless platform. A real team that cares about your brand looking exactly right — every single time.</p>
+      </div>
+
+      <div class="features-grid stagger">
+        <div class="feat-card">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div class="feat-title">Pre-Print Proofing</div>
+          <div class="feat-desc">Every order gets a digital mockup before we touch ink to fabric. You approve, we print. Zero guesswork.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div class="feat-title">48-Hour Rush</div>
+          <div class="feat-desc">Need it fast? Rush production on most products. Perfect for last-minute events and product launches.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+          <div class="feat-title">Volume Discounts</div>
+          <div class="feat-desc">Savings up to 40% on large orders. Bulk pricing kicks in automatically at 12+ units — no negotiation needed.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          <div class="feat-title">Premium Quality</div>
+          <div class="feat-desc">We match DTG, screen print, or embroidery to your fabric and design. Prints that stay vivid wash after wash.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+          <div class="feat-title">Real Human Support</div>
+          <div class="feat-desc">No chatbots. Our team responds within 2 hours on business days and can help review your design files.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" stroke-width="1.8"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="feat-title">100% Guarantee</div>
+          <div class="feat-desc">Not happy? We reprint or refund — no questions asked. We stand behind every item that leaves our facility.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="section testimonials-section">
+    <div class="section-inner">
+      <div class="reveal">
+        <div class="tag-pill">Customer Reviews</div>
+        <h2 class="section-title">They Ordered.<br/>They Came Back.</h2>
+        <p class="section-sub">From small startups to large corporates — here's what they said after receiving their orders.</p>
+      </div>
+
+      <div class="testi-grid stagger">
+        <div class="testi-card featured">
+          <div class="testi-stars">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <p class="testi-quote">"Ordered 200 polos for our company retreat. Every shirt was consistent, colours were spot-on, and they arrived a day early. The proof process meant zero surprises. We'll never go anywhere else."</p>
+          <div class="testi-author">
+            <div class="testi-avatar"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&q=80" alt="James K." /></div>
+            <div>
+              <div class="testi-name">James K.</div>
+              <div class="testi-role">Ops Manager, TechWave Inc.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testi-card">
+          <div class="testi-stars">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <p class="testi-quote">"Needed custom hoodies in 4 days. They hit the 48-hour rush, quality was fantastic, support was responsive. Absolutely recommend for event teams."</p>
+          <div class="testi-author">
+            <div class="testi-avatar"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=80&q=80" alt="Sarah R." /></div>
+            <div>
+              <div class="testi-name">Sarah R.</div>
+              <div class="testi-role">Event Coordinator, RunCity</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testi-card">
+          <div class="testi-stars">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <p class="testi-quote">"As a small brand doing my first run of 30 shirts, the proof process made me so confident. Results were crisp and professional. Customers love them."</p>
+          <div class="testi-author">
+            <div class="testi-avatar"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=80&q=80" alt="Maya L." /></div>
+            <div>
+              <div class="testi-name">Maya L.</div>
+              <div class="testi-role">Founder, Merch by Maya</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-bg-glow"></div>
+    <div class="cta-inner reveal">
+      <div class="tag-pill tag-pill-dark" style="margin: 0 auto 16px; display:inline-flex;">Ready to Start?</div>
+      <h2 class="cta-title">Your Brand Deserves<br/>to Look <span class="lime">This Good.</span></h2>
+      <p class="cta-sub">Join 2,000+ businesses that trust TshirtXpress for their custom apparel. No minimums. No hassle. Just great print.</p>
+      <div class="cta-actions">
+        <button class="btn btn-lime-lg">Start Your Order →</button>
+        <button class="btn btn-outline-white">Get a Free Quote</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="logo-dot"></div>
+          TshirtXpress
+        </div>
+        <p>Professional custom printing for teams, events, and brands. Quality you can wear, speed you can count on.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Products</h4>
+        <ul>
+          <li><a href="#">T-Shirts</a></li>
+          <li><a href="#">Hoodies</a></li>
+          <li><a href="#">Polo Shirts</a></li>
+          <li><a href="#">Tote Bags</a></li>
+          <li><a href="#">Caps</a></li>
+          <li><a href="#">All Products</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">How It Works</a></li>
+          <li><a href="#">Bulk Pricing</a></li>
+          <li><a href="#">Gallery</a></li>
+          <li><a href="#">Blog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">Track Order</a></li>
+          <li><a href="#">File Guidelines</a></li>
+          <li><a href="#">FAQs</a></li>
+          <li><a href="#">Returns</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 TshirtXpress. All rights reserved.</span>
+      <div class="footer-socials">
+        <div class="social-btn"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></div>
+        <div class="social-btn"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
+        <div class="social-btn"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg></div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ── Intersection Observer for scroll reveals ──
+    const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .stagger');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => observer.observe(el));
+
+    // ── Animated counters ──
+    function animateCounter(el, target, duration = 1600) {
+      let start = 0;
+      const step = (timestamp) => {
+        if (!start) start = timestamp;
+        const progress = Math.min((timestamp - start) / duration, 1);
+        // ease out
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.floor(eased * target).toLocaleString();
+        if (progress < 1) requestAnimationFrame(step);
+        else el.textContent = target.toLocaleString();
+      };
+      requestAnimationFrame(step);
+    }
+
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const target = parseInt(el.dataset.target);
+          animateCounter(el, target);
+          counterObserver.unobserve(el);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.counter').forEach(el => counterObserver.observe(el));
+
+    // ── Hero bento counter ──
+    const bentoCount = document.querySelector('[data-count]');
+    if (bentoCount) {
+      setTimeout(() => {
+        animateCounter(bentoCount, parseInt(bentoCount.dataset.count), 2000);
+      }, 800);
+    }
+
+    // ── Smooth hover glow on category tiles ──
+    document.querySelectorAll('.cat-tile').forEach(tile => {
+      tile.addEventListener('mouseenter', () => {
+        tile.style.zIndex = '2';
+      });
+      tile.addEventListener('mouseleave', () => {
+        tile.style.zIndex = '';
+      });
+    });
+  </script>
+</body>
+</html>
